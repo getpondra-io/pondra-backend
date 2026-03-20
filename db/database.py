@@ -219,27 +219,4 @@ async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-        # Convert sensor_readings to TimescaleDB hypertable
-        await conn.execute(text("""
-            SELECT create_hypertable(
-                'sensor_readings', 'time',
-                if_not_exists => TRUE,
-                chunk_time_interval => INTERVAL '1 day'
-            );
-        """))
-
-        # Auto-compress chunks older than 7 days
-        await conn.execute(text("""
-            ALTER TABLE sensor_readings SET (
-                timescaledb.compress,
-                timescaledb.compress_segmentby = 'farm_id'
-            );
-        """))
-
-        await conn.execute(text("""
-            SELECT add_compression_policy(
-                'sensor_readings',
-                INTERVAL '7 days',
-                if_not_exists => TRUE
-            );
-        """))
+        # TimescaleDB not available on Railway - using plain PostgreSQL
