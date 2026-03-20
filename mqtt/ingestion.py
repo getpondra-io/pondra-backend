@@ -83,7 +83,7 @@ class MQTTIngestionService:
     async def _connect_and_listen(self):
         async with aiomqtt.Client(
             hostname=settings.mqtt_broker_host,
-            port=settings.mqtt_broker_port,
+            port=settings.mqtt_broker_port_tls if settings.mqtt_use_tls else settings.mqtt_broker_port,
             username=settings.mqtt_username,
             password=settings.mqtt_password,
             identifier=settings.mqtt_client_id,
